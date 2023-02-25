@@ -29,16 +29,19 @@ public class KafKaConsumerService {
     public void consume(ConsumerRecord<String, Object> consumerRecord) {
         String eventType = consumerRecord.key();
         Map<String, Object> data = (Map<String, Object>) consumerRecord.value();
-        if (EventType.BLOG_CREATED.toString().equalsIgnoreCase(eventType)) {
-            logger.info("blog created");
-        } else if (EventType.BLOG_PUBLISHED.toString().equalsIgnoreCase(eventType)) {
-            Long blogId = Long.valueOf((Integer) data.get("blogId"));
-            blogService.updateTotalPublishedBlogs(blogId, OperationType.INCREASE_BLOG_COUNT);
-            logger.info("blog published");
-        } else if (EventType.BLOG_DELETED.toString().equalsIgnoreCase(eventType)) {
-            Long blogId = Long.valueOf((Integer) data.get("blogId"));
-            blogService.updateTotalPublishedBlogs(blogId, OperationType.DECREASE_BLOG_COUNT);
-            logger.info("blog deleted");
+
+        switch (EventType.valueOf(eventType)) {
+            case BLOG_CREATED -> logger.info("blog created");
+            case BLOG_PUBLISHED -> {
+                Long blogId = Long.valueOf((Integer) data.get("blogId"));
+                blogService.updateTotalPublishedBlogs(blogId, OperationType.INCREASE_BLOG_COUNT);
+                logger.info("blog published");
+            }
+            case BLOG_DELETED -> {
+                Long blogId = Long.valueOf((Integer) data.get("blogId"));
+                blogService.updateTotalPublishedBlogs(blogId, OperationType.DECREASE_BLOG_COUNT);
+                logger.info("blog deleted");
+            }
         }
     }
 }

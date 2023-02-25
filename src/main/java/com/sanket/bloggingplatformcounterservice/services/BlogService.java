@@ -37,7 +37,7 @@ public class BlogService {
                     case INCREASE_BLOG_COUNT -> 1;
                     case DECREASE_BLOG_COUNT -> -1;
                 };
-                author.setTotalBlogs(updatedBlogCount);
+                author.setTotalBlogs(Math.max(updatedBlogCount, 0));
                 author.setLastModifiedAt(now);
             });
             blog.setLastModifiedAt(now);
