@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -19,11 +18,11 @@ public class KafKaConsumerService {
     private final Logger logger =
             LoggerFactory.getLogger(KafKaConsumerService.class);
 
-    private final UserService userService;
+    private final BlogService blogService;
 
     @Autowired
-    public KafKaConsumerService(UserService userService) {
-        this.userService = userService;
+    public KafKaConsumerService(UserService userService, BlogService blogService) {
+        this.blogService = blogService;
     }
 
     @KafkaListener(groupId = AppConstants.GROUP_ID, topics = AppConstants.TOPIC_NAME)
@@ -33,12 +32,12 @@ public class KafKaConsumerService {
         if (EventType.BLOG_CREATED.toString().equalsIgnoreCase(eventType)) {
             logger.info("blog created");
         } else if (EventType.BLOG_PUBLISHED.toString().equalsIgnoreCase(eventType)) {
-            List<Integer> authorIds = (List<Integer>) data.get("authorIds");
-            userService.updateTotalBlogs(authorIds, OperationType.INCREASE_BLOG_COUNT);
+            Long blogId = Long.valueOf((Integer) data.get("blogId"));
+            blogService.updateTotalPublishedBlogs(blogId, OperationType.INCREASE_BLOG_COUNT);
             logger.info("blog published");
         } else if (EventType.BLOG_DELETED.toString().equalsIgnoreCase(eventType)) {
-            List<Integer> authorIds = (List<Integer>) data.get("authorIds");
-            userService.updateTotalBlogs(authorIds, OperationType.DECREASE_BLOG_COUNT);
+            Long blogId = Long.valueOf((Integer) data.get("blogId"));
+            blogService.updateTotalPublishedBlogs(blogId, OperationType.DECREASE_BLOG_COUNT);
             logger.info("blog deleted");
         }
     }
