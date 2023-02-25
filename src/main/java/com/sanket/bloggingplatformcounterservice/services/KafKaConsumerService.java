@@ -21,7 +21,7 @@ public class KafKaConsumerService {
     private final BlogService blogService;
 
     @Autowired
-    public KafKaConsumerService(UserService userService, BlogService blogService) {
+    public KafKaConsumerService(BlogService blogService) {
         this.blogService = blogService;
     }
 
